@@ -196,6 +196,7 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 		closestWeapon -> AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
 		CurrentWeapon = Cast<AWeapon>(closestWeapon);
 		bHasPistol = true;
+		MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
 	}
 	else
 	{
@@ -211,9 +212,10 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 
 void APrNetWorkCharacter::Shot(const FInputActionValue& Value)
 {
-	if(CurrentWeapon != nullptr)
+	if(CurrentWeapon != nullptr && CurrentWeapon -> GetWeaponComponent() -> GetAmmo() > 0)
 	{
 		CurrentWeapon -> Fire();
+		MainWidget -> RemoveBulletUI();
 		PlayerAnimInstance -> PlayFireMontage();
 	}
 }

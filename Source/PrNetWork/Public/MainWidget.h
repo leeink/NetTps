@@ -18,6 +18,16 @@ public:
     UPROPERTY(meta = (BindWidget))
 	class UImage* CrossHairImage;
 
+	UPROPERTY(meta = (BindWidget))
+	class UUniformGridPanel* BulletPanel;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> BulletWidgetClass;
+
 public:
 	void SetActiveCrossHair(bool bIsActive);
+
+	void InitBulletUI(int MaxAmmo);
+	void AddBulletUI();
+	void RemoveBulletUI();
 };

@@ -37,4 +37,7 @@ public:
 
 	virtual void Fire();
 	virtual void Reload();
+
+	FORCEINLINE UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
+	
 };
