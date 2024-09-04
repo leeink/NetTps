@@ -47,7 +47,7 @@ void UNetTpsAnimInstance::PlayReloadMontage()
 
 void UNetTpsAnimInstance::AnimNotify_ReloadEnd(UAnimNotify* Notify)
 {
-	Owner -> InitMainWidget();
+	Owner -> UpdateBulletUI();
 }
 
 

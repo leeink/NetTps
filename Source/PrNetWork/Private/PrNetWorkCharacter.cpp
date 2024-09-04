@@ -84,9 +84,10 @@ void APrNetWorkCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerAnimInstance = CastChecked<UNetTpsAnimInstance>(GetMesh() -> GetAnimInstance());
-	
-	MainWidget = CastChecked<UMainWidget>(CreateWidget(GetWorld(), MainWidgetClass));
-	MainWidget -> AddToViewport();
+
+	InitMainWidget();
+	/*MainWidget = CastChecked<UMainWidget>(CreateWidget(GetWorld(), MainWidgetClass));
+	MainWidget -> AddToViewport();*/
 
 	HealthBar = Cast<UHealthBar>(HealthWidget -> GetWidget());
 }
@@ -256,8 +257,20 @@ void APrNetWorkCharacter::PlayerDamage(float Amount)
 	}
 }
 
-
 void APrNetWorkCharacter::InitMainWidget()
+{
+	APlayerController * PlayerController = Cast<APlayerController>(GetController());
+	/*if(PlayerController == nullptr)
+	{
+		return;
+	}*/
+	
+	MainWidget = CastChecked<UMainWidget>(CreateWidget(GetWorld(), MainWidgetClass));
+	MainWidget -> AddToViewport();
+}
+
+
+void APrNetWorkCharacter::UpdateBulletUI()
 {
 	MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
 }

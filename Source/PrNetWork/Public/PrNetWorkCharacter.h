@@ -125,6 +125,7 @@ public:
 	void PlayerDamage(float Amount);
 	
 	void InitMainWidget();
+	void UpdateBulletUI();
 	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
