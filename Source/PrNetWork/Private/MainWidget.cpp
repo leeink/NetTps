@@ -38,3 +38,11 @@ void UMainWidget::RemoveBulletUI()
 	
 	BulletPanel->RemoveChildAt(BulletPanel->GetChildrenCount() - 1);
 }
+
+void UMainWidget::RemoveAllBulletUI()
+{
+	for(auto child : BulletPanel->GetAllChildren())
+	{
+		BulletPanel->RemoveChild(child);
+	}
+}

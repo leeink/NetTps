@@ -112,6 +112,7 @@ void APrNetWorkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(Slot2, ETriggerEvent::Triggered, this, &APrNetWorkCharacter::BaseSlot);
 		EnhancedInputComponent->BindAction(WeaponPickup, ETriggerEvent::Started, this, &APrNetWorkCharacter::Interaction);
 		EnhancedInputComponent->BindAction(IA_Shot, ETriggerEvent::Triggered, this, &APrNetWorkCharacter::Shot);
+		EnhancedInputComponent->BindAction(IA_Reload, ETriggerEvent::Started, this, &APrNetWorkCharacter::Reload);
 	}
 	else
 	{
@@ -200,7 +201,7 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 	}
 	else
 	{
-		if(CurrentWeapon != nullptr)
+		if(CurrentWeapon != nullptr && bIsReloading == false)
 		{
 			CurrentWeapon -> SetOwner(nullptr);
 			CurrentWeapon -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -212,13 +213,31 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 
 void APrNetWorkCharacter::Shot(const FInputActionValue& Value)
 {
-	if(CurrentWeapon != nullptr && CurrentWeapon -> GetWeaponComponent() -> GetAmmo() > 0)
+	if(CurrentWeapon != nullptr && CurrentWeapon -> GetWeaponComponent() -> GetAmmo() > 0 && bIsReloading == false && EquipIndex == 0)
 	{
 		CurrentWeapon -> Fire();
 		MainWidget -> RemoveBulletUI();
 		PlayerAnimInstance -> PlayFireMontage();
 	}
 }
+
+void APrNetWorkCharacter::Reload(const FInputActionValue& Value)
+{
+	if(CurrentWeapon != nullptr && bIsReloading == false && EquipIndex == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Reload"));
+		bIsReloading = true;
+		CurrentWeapon -> Reload();
+		PlayerAnimInstance -> PlayReloadMontage();
+		MainWidget -> RemoveAllBulletUI();
+	}
+}
+
+void APrNetWorkCharacter::InitMainWidget()
+{
+	MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
+}
+
 
 
 void APrNetWorkCharacter::OnPickUpOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

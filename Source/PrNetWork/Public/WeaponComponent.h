@@ -27,4 +27,6 @@ protected:
 public:
 	FORCEINLINE int GetAmmo() const { return Ammo; }
 	FORCEINLINE int GetMaxAmmo() const { return MaxAmmo; }
+	FORCEINLINE float GetDamage() const { return Damage; }
+	FORCEINLINE void SetAmmo(int NewAmmo) { Ammo = NewAmmo; }
 };

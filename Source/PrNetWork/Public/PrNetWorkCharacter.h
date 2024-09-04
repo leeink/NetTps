@@ -55,6 +55,9 @@ class APrNetWorkCharacter : public ACharacter
 	UInputAction* IA_Shot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* IA_Reload;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* Slot1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -77,6 +80,7 @@ class APrNetWorkCharacter : public ACharacter
 
 	int EquipIndex = 0;
 	bool bHasPistol = false;
+	bool bIsReloading = false;
 
 public:
 	APrNetWorkCharacter();
@@ -94,6 +98,7 @@ protected:
 	void BaseSlot(const FInputActionValue& Value);
 	void Interaction(const FInputActionValue& Value);
 	void Shot(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
@@ -103,12 +108,14 @@ protected:
 	virtual void BeginPlay();
 
 public:
+	void InitMainWidget();
 	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE int GetEquipIndex() const { return EquipIndex; }
+	FORCEINLINE void SetIsReload(bool bIsReload) { bIsReloading = bIsReload; }
 
 	UFUNCTION()
 	void OnPickUpOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

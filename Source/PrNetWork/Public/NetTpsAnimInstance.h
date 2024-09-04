@@ -27,6 +27,9 @@ class PRNETWORK_API UNetTpsAnimInstance : public UAnimInstance
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* FireMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ReloadMontage;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float Direction;
 
@@ -45,4 +48,8 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayFireMontage();
+	void PlayReloadMontage();
+
+	UFUNCTION()
+	void AnimNotify_ReloadEnd(UAnimNotify* Notify);
 };

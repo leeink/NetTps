@@ -40,7 +40,7 @@ void AWeapon::Fire()
 {
 	FHitResult Hit;
 	FVector Start = WeaponComponent->GetSocketLocation("MuzzleFlash");
-	FVector End = Start + WeaponComponent->GetSocketRotation("MuzzleFlash").Vector() * 10000.f;
+	FVector End = Start + UGameplayStatics::GetPlayerCameraManager(this, 0) -> GetActorForwardVector() * 10000.f;
 
 	ECollisionChannel Channel = ECollisionChannel::ECC_Visibility;
 	
@@ -55,9 +55,16 @@ void AWeapon::Fire()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireSpark, Hit.ImpactPoint, FRotator::ZeroRotator, FVector(1.f));
 	}
+
+	WeaponComponent->SetAmmo(WeaponComponent->GetAmmo() - 1);
 }
 
 void AWeapon::Reload()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Reload"));
+	if(WeaponComponent->GetAmmo() >= WeaponComponent->GetMaxAmmo())
+	{
+		return;
+	}
+
+	WeaponComponent->SetAmmo(WeaponComponent->GetMaxAmmo());
 }

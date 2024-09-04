@@ -34,3 +34,19 @@ void UNetTpsAnimInstance::PlayFireMontage()
 		Montage_Play(FireMontage, 2.f);
 	}
 }
+
+void UNetTpsAnimInstance::PlayReloadMontage()
+{
+	if(ReloadMontage != nullptr)
+	{
+		Montage_Play(ReloadMontage, 2.f);
+	}
+	Owner -> SetIsReload(false);
+}
+
+void UNetTpsAnimInstance::AnimNotify_ReloadEnd(UAnimNotify* Notify)
+{
+	Owner -> InitMainWidget();
+}
+
+

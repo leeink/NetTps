@@ -30,4 +30,5 @@ public:
 	void InitBulletUI(int MaxAmmo);
 	void AddBulletUI();
 	void RemoveBulletUI();
+	void RemoveAllBulletUI();
 };
