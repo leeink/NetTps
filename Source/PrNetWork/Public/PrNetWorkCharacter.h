@@ -7,11 +7,13 @@
 #include "Logging/LogMacros.h"
 #include "PrNetWorkCharacter.generated.h"
 
+class UHealthBar;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class UWeaponComponent;
+class UHealthComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -34,6 +36,12 @@ class APrNetWorkCharacter : public ACharacter
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PickUpCollision, meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* PickUpCollision;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = HealthWidget, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* HealthWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PickUpCollision, meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HeathSystem;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -78,6 +86,12 @@ class APrNetWorkCharacter : public ACharacter
 	UPROPERTY()
 	UMainWidget* MainWidget;
 
+	UPROPERTY()
+	UHealthBar* HealthBar;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = State, meta = (AllowPrivateAccess = "true"))
+	bool bIsDead = false;
+
 	int EquipIndex = 0;
 	bool bHasPistol = false;
 	bool bIsReloading = false;
@@ -108,6 +122,8 @@ protected:
 	virtual void BeginPlay();
 
 public:
+	void PlayerDamage(float Amount);
+	
 	void InitMainWidget();
 	
 	/** Returns CameraBoom subobject **/
@@ -116,6 +132,10 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE int GetEquipIndex() const { return EquipIndex; }
 	FORCEINLINE void SetIsReload(bool bIsReload) { bIsReloading = bIsReload; }
+	FORCEINLINE bool GetIsDead() const { return bIsDead; }
+	FORCEINLINE void SetIsDead(bool newState) { bIsDead = newState; }
+	FORCEINLINE UMainWidget* GetMainWidget() const { return MainWidget; }
+	FORCEINLINE UHealthComponent* GetHealthComponent() const { return HeathSystem; }
 
 	UFUNCTION()
 	void OnPickUpOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

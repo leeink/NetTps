@@ -42,6 +42,9 @@ class PRNETWORK_API UNetTpsAnimInstance : public UAnimInstance
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipState", meta = (AllowPrivateAccess = "true"))
 	bool bHasPistol = true;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State", meta = (AllowPrivateAccess = "true"))
+	bool bIsDead = false;
+
 
 public:
 	virtual void NativeInitializeAnimation() override;

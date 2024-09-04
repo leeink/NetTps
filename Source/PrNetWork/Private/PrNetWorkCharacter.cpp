@@ -9,6 +9,8 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HealthBar.h"
+#include "HealthComponent.h"
 #include "InputActionValue.h"
 #include "MainWidget.h"
 #include "NetTpsAnimInstance.h"
@@ -16,6 +18,7 @@
 #include "WeaponComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -63,6 +66,11 @@ APrNetWorkCharacter::APrNetWorkCharacter()
 	PickUpCollision->SetupAttachment(RootComponent);
 	PickUpCollision-> SetBoxExtent(FVector(50.f,50.f,50.f));
 
+	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthWidget -> SetupAttachment(GetMesh());
+
+	HeathSystem = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthSystem"));
+
 	PickUpCollision->OnComponentBeginOverlap.AddDynamic(this, &APrNetWorkCharacter::OnPickUpOverlap);
 	PickUpCollision->OnComponentEndOverlap.AddDynamic(this, &APrNetWorkCharacter::OnEndOverlap);
 
@@ -76,8 +84,11 @@ void APrNetWorkCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerAnimInstance = CastChecked<UNetTpsAnimInstance>(GetMesh() -> GetAnimInstance());
+	
 	MainWidget = CastChecked<UMainWidget>(CreateWidget(GetWorld(), MainWidgetClass));
 	MainWidget -> AddToViewport();
+
+	HealthBar = Cast<UHealthBar>(HealthWidget -> GetWidget());
 }
 
 
@@ -232,6 +243,19 @@ void APrNetWorkCharacter::Reload(const FInputActionValue& Value)
 		MainWidget -> RemoveAllBulletUI();
 	}
 }
+
+void APrNetWorkCharacter::PlayerDamage(float Amount)
+{
+	HeathSystem -> Damage(Amount);
+	MainWidget -> UpdateHealthBar(HeathSystem -> GetHealth() / HeathSystem -> GetMaxHealth());
+	HealthBar -> UpdateHealthBar(HeathSystem -> GetHealth() / HeathSystem -> GetMaxHealth());
+
+	if(HeathSystem -> GetHealth() <= 0)
+	{
+		bIsDead = true;
+	}
+}
+
 
 void APrNetWorkCharacter::InitMainWidget()
 {

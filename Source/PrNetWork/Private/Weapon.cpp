@@ -3,6 +3,8 @@
 
 #include "Weapon.h"
 
+#include "HealthComponent.h"
+#include "PrNetWorkCharacter.h"
 #include "WeaponComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,6 +53,11 @@ void AWeapon::Fire()
 	GetWorld() -> LineTraceSingleByChannel(Hit, Start, End, Channel, Params);
 	UKismetSystemLibrary::DrawDebugLine(this, Start, End, FLinearColor::Red, .5f, 1.f);
 
+	if(APrNetWorkCharacter* Target = Cast<APrNetWorkCharacter>(Hit.GetActor()))
+	{
+		Target->PlayerDamage(WeaponComponent->GetDamage());
+	}
+	
 	if(Hit.GetActor() != nullptr && FireSpark != nullptr)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireSpark, Hit.ImpactPoint, FRotator::ZeroRotator, FVector(1.f));

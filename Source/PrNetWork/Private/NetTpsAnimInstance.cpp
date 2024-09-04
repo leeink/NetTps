@@ -25,6 +25,7 @@ void UNetTpsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = Owner->GetVelocity().Size();
 	Direction = FVector::DotProduct(Owner->GetActorForwardVector(),Owner->GetActorRightVector());
 	EquipIndex = Owner->GetEquipIndex();
+	bIsDead = Owner->GetIsDead();
 }
 
 void UNetTpsAnimInstance::PlayFireMontage()

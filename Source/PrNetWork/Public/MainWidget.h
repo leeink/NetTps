@@ -21,6 +21,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* BulletPanel;
 
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HealthBar;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> BulletWidgetClass;
 
@@ -31,4 +34,5 @@ public:
 	void AddBulletUI();
 	void RemoveBulletUI();
 	void RemoveAllBulletUI();
+	void UpdateHealthBar(float Percent);
 };

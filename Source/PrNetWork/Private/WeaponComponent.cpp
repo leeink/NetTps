@@ -3,5 +3,4 @@
 
 #include "WeaponComponent.h"
 
-#include "PickUpComponent.h"
 #include "GameFramework/Character.h"

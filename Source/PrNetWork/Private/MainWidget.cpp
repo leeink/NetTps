@@ -4,6 +4,7 @@
 #include "MainWidget.h"
 
 #include "Components/Image.h"
+#include "Components/ProgressBar.h"
 #include "Components/UniformGridPanel.h"
 
 void UMainWidget::SetActiveCrossHair(bool bIsActive)
@@ -44,5 +45,13 @@ void UMainWidget::RemoveAllBulletUI()
 	for(auto child : BulletPanel->GetAllChildren())
 	{
 		BulletPanel->RemoveChild(child);
+	}
+}
+
+void UMainWidget::UpdateHealthBar(float Percent)
+{
+	if(HealthBar != nullptr)
+	{
+		HealthBar->SetPercent(Percent);
 	}
 }
