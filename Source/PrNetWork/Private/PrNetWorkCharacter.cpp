@@ -14,6 +14,7 @@
 #include "InputActionValue.h"
 #include "MainWidget.h"
 #include "NetTpsAnimInstance.h"
+#include "PrNetWork.h"
 #include "Weapon.h"
 #include "WeaponComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -28,6 +29,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 APrNetWorkCharacter::APrNetWorkCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -90,6 +93,13 @@ void APrNetWorkCharacter::BeginPlay()
 	MainWidget -> AddToViewport();*/
 
 	HealthBar = Cast<UHealthBar>(HealthWidget -> GetWidget());
+}
+
+void APrNetWorkCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	PrintNetLog();
 }
 
 
@@ -208,6 +218,7 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 		closestWeapon -> SetOwner(this);
 		closestWeapon -> AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
 		CurrentWeapon = Cast<AWeapon>(closestWeapon);
+		CurrentWeapon -> DeactivationCollision();
 		bHasPistol = true;
 		MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
 	}
@@ -217,6 +228,7 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 		{
 			CurrentWeapon -> SetOwner(nullptr);
 			CurrentWeapon -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			CurrentWeapon -> ActivationCollion();
 			CurrentWeapon = nullptr;
 			bHasPistol = false;
 		}
@@ -275,6 +287,14 @@ void APrNetWorkCharacter::UpdateBulletUI()
 	MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
 }
 
+void APrNetWorkCharacter::PrintNetLog()
+{
+	const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection!") : TEXT("InValid Connection!");
+	const FString ownerName = GetOwner() != nullptr ? GetOwner() -> GetName() : TEXT("No Owner");
+	const FString logStr = FString::Printf(TEXT("Connection : %s\n LocalRole: %s\nRemoteRole : %s\nOwner : %s"), *conStr, *ownerName, *LOCALROLE, *REMOTEROLE);
+
+	DrawDebugString(GetWorld(), GetActorLocation(), logStr, nullptr, FColor::Red, 0.01f);
+}
 
 
 void APrNetWorkCharacter::OnPickUpOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

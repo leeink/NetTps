@@ -75,3 +75,13 @@ void AWeapon::Reload()
 
 	WeaponComponent->SetAmmo(WeaponComponent->GetMaxAmmo());
 }
+
+void AWeapon::ActivationCollion()
+{
+	Collision -> SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AWeapon::DeactivationCollision()
+{
+	Collision -> SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}

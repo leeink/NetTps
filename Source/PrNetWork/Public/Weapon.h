@@ -38,6 +38,9 @@ public:
 	virtual void Fire();
 	virtual void Reload();
 
+	void ActivationCollion();
+	void DeactivationCollision();
+
 	FORCEINLINE UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 	
 };
