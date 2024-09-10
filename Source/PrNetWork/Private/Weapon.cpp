@@ -22,6 +22,8 @@ AWeapon::AWeapon()
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
 	WeaponComponent->SetupAttachment(RootComponent);
 
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -42,6 +44,7 @@ void AWeapon::Fire()
 {
 	FHitResult Hit;
 	FVector Start = WeaponComponent->GetSocketLocation("MuzzleFlash");
+	
 	FVector End = Start + UGameplayStatics::GetPlayerCameraManager(this, 0) -> GetActorForwardVector() * 10000.f;
 
 	ECollisionChannel Channel = ECollisionChannel::ECC_Visibility;
@@ -76,7 +79,7 @@ void AWeapon::Reload()
 	WeaponComponent->SetAmmo(WeaponComponent->GetMaxAmmo());
 }
 
-void AWeapon::ActivationCollion()
+void AWeapon::ActivationCollsion()
 {
 	Collision -> SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }

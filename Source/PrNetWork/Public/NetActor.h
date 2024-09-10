@@ -56,4 +56,10 @@ public:
 	void OnRep_RotYaw();
 	UFUNCTION()
 	void OnRep_ChangeColor();
+
+	UFUNCTION(Server, Reliable)
+	void ServerChangeColor(const FLinearColor NewColor);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastChangeColor(const FLinearColor NewColor);
 };

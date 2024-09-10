@@ -93,12 +93,15 @@ class APrNetWorkCharacter : public ACharacter
 	bool bIsDead = false;
 
 	int EquipIndex = 0;
+
+	UPROPERTY(Replicated)
 	bool bHasPistol = false;
 	bool bIsReloading = false;
 
 public:
 	APrNetWorkCharacter();
-	
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 
@@ -107,12 +110,42 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-
+	
 	void PistolSlot(const FInputActionValue& Value);
 	void BaseSlot(const FInputActionValue& Value);
+
+	//* Interaction */
+	UFUNCTION()
 	void Interaction(const FInputActionValue& Value);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteraction();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastInteraction();
+	//* Interaction */
+
+	//* Shot */
+	UFUNCTION()
 	void Shot(const FInputActionValue& Value);
+	
+	UFUNCTION(Server, Unreliable)
+	void ServerShot(const FInputActionValue& Value);
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastShot(const FInputActionValue& Value);
+	//* Shot*/
+	
+	//* Reload */
+	UFUNCTION()
 	void Reload(const FInputActionValue& Value);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastReload();
+	//* Reload */
 
 protected:
 	// APawn interface

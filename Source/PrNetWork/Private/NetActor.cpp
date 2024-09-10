@@ -38,10 +38,13 @@ void ANetActor::BeginPlay()
 	{
 		GetWorld() -> GetTimerManager().SetTimer(ColorTimerHandle, FTimerDelegate::CreateLambda([this]()
 		{
-			ChangeColor = FLinearColor(FMath::RandRange(0.f, 1.f),
+			FLinearColor MatColor = FLinearColor::MakeRandomColor();
+			ServerChangeColor(MatColor);
+			MulticastChangeColor(MatColor);
+			/*ChangeColor = FLinearColor(FMath::RandRange(0.f, 1.f),
 				FMath::RandRange(0.f, 1.f),
 				FMath::RandRange(0.f, 1.f));
-					OnRep_ChangeColor();
+					OnRep_ChangeColor();*/
 		}), 1.f, true);
 	}
 }
@@ -102,7 +105,7 @@ void ANetActor::FindOwner()
 			SetOwner(newOwner);
 		}
 	}
-	DrawDebugSphere(GetWorld(), GetActorLocation(), SearchDistance, 16, FColor::Orange, true,0.01f, 0, 1.f);
+	DrawDebugSphere(GetWorld(), GetActorLocation(), SearchDistance, 16, FColor::Orange, false,0.01f, 0, 1.f);
 }
 
 void ANetActor::OnRep_RotYaw()
@@ -119,3 +122,21 @@ void ANetActor::OnRep_ChangeColor()
 		DynamicMaterial -> SetVectorParameterValue(TEXT("FloorColor"), ChangeColor);
 	}
 }
+
+
+void ANetActor::ServerChangeColor_Implementation(const FLinearColor NewColor)
+{
+	if(DynamicMaterial)
+	{
+		DynamicMaterial -> SetVectorParameterValue(TEXT("FloorColor"), NewColor);
+	}
+}
+
+void ANetActor::MulticastChangeColor_Implementation(const FLinearColor NewColor)
+{
+	if(DynamicMaterial)
+	{
+		DynamicMaterial -> SetVectorParameterValue(TEXT("FloorColor"), NewColor);
+	}
+}
+

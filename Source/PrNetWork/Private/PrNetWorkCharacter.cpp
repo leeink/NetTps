@@ -21,6 +21,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -74,11 +75,21 @@ APrNetWorkCharacter::APrNetWorkCharacter()
 
 	HeathSystem = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthSystem"));
 
+	bReplicates = true;
+	ACharacter::SetReplicateMovement(true);
+
 	PickUpCollision->OnComponentBeginOverlap.AddDynamic(this, &APrNetWorkCharacter::OnPickUpOverlap);
 	PickUpCollision->OnComponentEndOverlap.AddDynamic(this, &APrNetWorkCharacter::OnEndOverlap);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void APrNetWorkCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APrNetWorkCharacter, bHasPistol);
 }
 
 void APrNetWorkCharacter::BeginPlay()
@@ -89,8 +100,6 @@ void APrNetWorkCharacter::BeginPlay()
 	PlayerAnimInstance = CastChecked<UNetTpsAnimInstance>(GetMesh() -> GetAnimInstance());
 
 	InitMainWidget();
-	/*MainWidget = CastChecked<UMainWidget>(CreateWidget(GetWorld(), MainWidgetClass));
-	MainWidget -> AddToViewport();*/
 
 	HealthBar = Cast<UHealthBar>(HealthWidget -> GetWidget());
 }
@@ -192,6 +201,16 @@ void APrNetWorkCharacter::BaseSlot(const FInputActionValue& Value)
 
 void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 {
+	ServerInteraction();
+}
+
+void APrNetWorkCharacter::ServerInteraction_Implementation()
+{
+	MulticastInteraction();
+}
+
+void APrNetWorkCharacter::MulticastInteraction_Implementation()
+{
 	if(bHasPistol == false)
 	{
 		if(OverlappingActors.Num() == 0)
@@ -220,7 +239,10 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 		CurrentWeapon = Cast<AWeapon>(closestWeapon);
 		CurrentWeapon -> DeactivationCollision();
 		bHasPistol = true;
-		MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
+		if(IsLocallyControlled())	
+		{
+			MainWidget -> InitBulletUI(CurrentWeapon -> GetWeaponComponent() -> GetMaxAmmo());
+		}
 	}
 	else
 	{
@@ -228,32 +250,65 @@ void APrNetWorkCharacter::Interaction(const FInputActionValue& Value)
 		{
 			CurrentWeapon -> SetOwner(nullptr);
 			CurrentWeapon -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-			CurrentWeapon -> ActivationCollion();
+			CurrentWeapon -> ActivationCollsion();
 			CurrentWeapon = nullptr;
 			bHasPistol = false;
+		}
+		if(IsLocallyControlled())
+		{
+			MainWidget -> RemoveAllBulletUI();
 		}
 	}
 }
 
 void APrNetWorkCharacter::Shot(const FInputActionValue& Value)
 {
+	ServerShot(Value);
+}
+
+void APrNetWorkCharacter::ServerShot_Implementation(const FInputActionValue& Value)
+{
+	MulticastShot(Value);
+}
+
+void APrNetWorkCharacter::MulticastShot_Implementation(const FInputActionValue& Value)
+{
 	if(CurrentWeapon != nullptr && CurrentWeapon -> GetWeaponComponent() -> GetAmmo() > 0 && bIsReloading == false && EquipIndex == 0)
 	{
 		CurrentWeapon -> Fire();
-		MainWidget -> RemoveBulletUI();
 		PlayerAnimInstance -> PlayFireMontage();
+	}
+	if(IsLocallyControlled())
+	{
+		MainWidget -> RemoveBulletUI();
 	}
 }
 
 void APrNetWorkCharacter::Reload(const FInputActionValue& Value)
 {
-	if(CurrentWeapon != nullptr && bIsReloading == false && EquipIndex == 0)
+	ServerReload();
+}
+
+void APrNetWorkCharacter::ServerReload_Implementation()
+{
+	MulticastReload();
+}
+
+void APrNetWorkCharacter::MulticastReload_Implementation()
+{
+	if(bHasPistol)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Reload"));
-		bIsReloading = true;
-		CurrentWeapon -> Reload();
-		PlayerAnimInstance -> PlayReloadMontage();
-		MainWidget -> RemoveAllBulletUI();
+		if(CurrentWeapon != nullptr && bIsReloading == false && EquipIndex == 0)
+		{
+			bIsReloading = true;
+			CurrentWeapon -> Reload();
+			PlayerAnimInstance -> PlayReloadMontage();
+		}
+	
+		if(IsLocallyControlled())
+		{
+			MainWidget -> RemoveAllBulletUI();
+		}
 	}
 }
 
